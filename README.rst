@@ -1,4 +1,4 @@
 dju-common
 ==========
 
-Django Utils Common Library
+Django Utils: Common Library
