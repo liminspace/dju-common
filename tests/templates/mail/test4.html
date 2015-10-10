@@ -1,0 +1,16 @@
+{% extends 'mail/base.html' %}
+
+
+{% block subject %}Test subject 4{% endblock %}
+
+
+{% block plain_body %}
+    {{ STATIC_CP_VALUE }}
+{% endblock %}
+
+
+{% block html_body %}
+    <p>
+        {{ STATIC_CP_VALUE }}
+    </p>
+{% endblock %}

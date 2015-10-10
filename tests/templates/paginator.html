@@ -1,0 +1,32 @@
+{% load dju_common %}{% strip '' %}
+{% if page.paginator.num_pages > 1 %}
+    {% if page.has_previous %}
+        <li>
+            <a href="?{{ param_name }}={{ page.previous_page_number }}">prev</a>
+        </li>
+    {% else %}
+        <li class="disabled">prev</li>
+    {% endif %}
+    {% for p in pages %}
+        {% if p == page.number %}
+            <li class="active">
+                <a href="?{{ param_name }}={{ p }}">{{ p }}</a>
+            </li>
+        {% else %}
+            {% if p == separator %}
+                <li class="disabled">...</li>
+            {% else %}
+                <li>
+                    <a href="?{{ param_name }}={{ p }}">{{ p }}</a>
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if page.has_next %}
+        <li>
+            <a href="?{{ param_name }}={{ page.next_page_number }}">next</a>
+        </li>
+    {% else %}
+        <li class="disabled">next</li>
+    {% endif %}
+{% endif %}{% endstrip %}

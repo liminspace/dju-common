@@ -1,0 +1,16 @@
+{% extends 'mail/base.html' %}
+
+
+{% block subject %}Test subject 2{% endblock %}
+
+
+{% block plain_body %}
+    {{ now|date:'Y.m.d H:i:s' }}
+{% endblock %}
+
+
+{% block html_body %}
+    <p>
+        {{ now|date:'Y.m.d H:i:s' }}
+    </p>
+{% endblock %}

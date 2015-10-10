@@ -1,0 +1,35 @@
+{% block subject %}Test email from {{ SITE.domain }}{% endblock %}
+
+
+{% block plain %}
+    Hi!
+
+    This is the test email. It helps to test sending email from Your project.
+
+    Good luck!
+
+    --------
+    Please don't reply to this email.
+{% endblock %}
+
+
+{% block html %}
+    <!DOCTYPE html>
+    <html>
+    <head></head>
+    <body style="font-size: 16px; line-height: 1.5;">
+        <p style="font-size: 18px;">
+            Hi!
+        </p>
+        <p>
+            This is the test email. It helps to test sending email from Your project.
+        </p>
+        <p style="font-size: 18px;">
+            Good luck!
+        </p>
+        <p style="font-size: 13px; color: #555555;">
+            Please don't reply to this email.
+        </p>
+    </body>
+    </html>
+{% endblock %}

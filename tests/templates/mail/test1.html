@@ -1,0 +1,16 @@
+{% extends 'mail/base.html' %}
+
+
+{% block subject %}Test subject 1 {{ m }}{% endblock %}
+
+
+{% block plain_body %}
+    It is the test mail. {{ m }}
+{% endblock %}
+
+
+{% block html_body %}
+    <p>
+        It is the test mail. {{ m }}
+    </p>
+{% endblock %}

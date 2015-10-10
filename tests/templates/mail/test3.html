@@ -1,0 +1,18 @@
+{% extends 'mail/base.html' %}
+
+{% load i18n %}
+
+
+{% block subject %}Test subject 3{% endblock %}
+
+
+{% block plain_body %}
+    {% trans 'Phone number' %}
+{% endblock %}
+
+
+{% block html_body %}
+    <p>
+        {% trans 'Phone number' %}
+    </p>
+{% endblock %}

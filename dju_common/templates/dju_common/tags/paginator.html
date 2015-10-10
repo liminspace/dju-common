@@ -1,0 +1,42 @@
+{% load dju_common %}
+{% if page.paginator.num_pages > 1 %}
+    <ul class="pagination">
+        {% if page.has_previous %}
+            <li>
+                <a href="?{{ param_name }}={{ page.previous_page_number }}&{% url_getvars_without param_name %}"
+                   rel="prev">&laquo;</a>
+            </li>
+        {% else %}
+            <li class="disabled">
+                <span>&laquo;</span>
+            </li>
+        {% endif %}
+        {% for p in pages %}
+            {% if p == page.number %}
+                <li class="active">
+                    <a href="?{{ param_name }}={{ p }}&{% url_getvars_without param_name %}">{{ p }}</a>
+                </li>
+            {% else %}
+                {% if p == separator %}
+                    <li class="disabled">
+                        <span>...</span>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="?{{ param_name }}={{ p }}&{% url_getvars_without param_name %}">{{ p }}</a>
+                    </li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if page.has_next %}
+            <li>
+                <a href="?{{ param_name }}={{ page.next_page_number }}&{% url_getvars_without param_name %}"
+                   rel="next">&raquo;</a>
+            </li>
+        {% else %}
+            <li class="disabled">
+                <span>&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}

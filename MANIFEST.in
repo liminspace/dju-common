@@ -1,0 +1,4 @@
+include README.md
+recursive-include dju_common/locale *
+recursive-include dju_common/static *
+recursive-include dju_common/templates *

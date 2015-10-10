@@ -1,0 +1,48 @@
+{% block subject %}no subject{% endblock %}
+
+
+{% block plain %}
+    {% block plain_welcome %}
+        Hello!
+    {% endblock %}
+    {% block plain_body %}
+        PLAIN_BODY
+    {% endblock %}
+    {% block plain_footer %}
+        Best regards, dj-utils.
+    {% endblock %}
+    --------
+    This message is generated automatically. Please do not reply to it.
+{% endblock %}
+
+
+{% block html %}
+    <!DOCTYPE html>
+    <html>
+    <head></head>
+    <body style="font-size: 16px; line-height: 1.5;">
+        <p style="font-size: 18px;">
+            {% block html_welcome %}
+                Hello!
+            {% endblock %}
+        </p>
+        <div>
+            {% block html_body %}
+                HTML_BODY
+            {% endblock %}
+        </div>
+        <div>
+            {% block html_footer %}
+                <p style="font-size: 18px;">
+                    Best regards, dj-utils.
+                </p>
+            {% endblock %}
+        </div>
+        <div style="font-size: 13px; color: #555555;">
+            <p>
+                This message is generated automatically. Please do not reply to it.
+            </p>
+        </div>
+    </body>
+    </html>
+{% endblock %}
