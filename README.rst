@@ -1,2 +1,4 @@
-# dju-common
+dju-common
+==========
+
 Django Utils Common Library
