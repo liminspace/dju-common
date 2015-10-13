@@ -22,7 +22,7 @@ COMMANDS_INFO = {
 }
 
 GETTEXT_EXTENSIONS = {
-    'django': ['html', 'txt'],
+    'django': ['html', 'txt', 'py'],
     'djangojs': ['js'],
 }
 
