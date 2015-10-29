@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-14 01:25+0300\n"
+"POT-Creation-Date: 2015-10-29 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,17 +19,17 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: dju_common/tools.py:88
+#: dju_common/tools.py:93
 msgid "k."
-msgstr ""
+msgstr " тыс."
 
-#: dju_common/tools.py:89
+#: dju_common/tools.py:94
 msgid " mln."
-msgstr ""
+msgstr " млн."
 
-#: dju_common/tools.py:90
+#: dju_common/tools.py:95
 msgid " bln."
-msgstr ""
+msgstr " млрд."
 
 #: tests/templates/mail/test3.html:10 tests/templates/mail/test3.html.py:16
 msgid "Phone number"
