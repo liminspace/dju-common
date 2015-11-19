@@ -1,5 +1,5 @@
 import os
-from StringIO import StringIO
+from cStringIO import StringIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
