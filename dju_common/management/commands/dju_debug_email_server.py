@@ -5,9 +5,10 @@ import base64
 import re
 import datetime
 import subprocess
+import traceback
 from smtpd import SMTPServer
 from django.core.management.base import BaseCommand
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, force_str
 from dju_common.settings import DJU_EMAIL_DEBUG_PATH, DJU_EMAIL_DEBUG_IN_CONSOLE, DJU_EMAIL_DEBUG_IN_FILES
 
 
@@ -36,9 +37,9 @@ class DebuggingServer(SMTPServer):
     @staticmethod
     def _get_fn(fn_base, n=None):
         if n is None:
-            return os.path.join(DJU_EMAIL_DEBUG_PATH, u'{}.eml'.format(fn_base)).replace('\\', '/')
+            return os.path.join(DJU_EMAIL_DEBUG_PATH, '{}.eml'.format(fn_base)).replace('\\', '/')
         else:
-            return os.path.join(DJU_EMAIL_DEBUG_PATH, u'{}_{}.eml'.format(fn_base, n)).replace('\\', '/')
+            return os.path.join(DJU_EMAIL_DEBUG_PATH, '{}_{}.eml'.format(fn_base, n)).replace('\\', '/')
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         try:
@@ -52,6 +53,7 @@ class DebuggingServer(SMTPServer):
                     datetime.datetime.now().strftime(u'%Y-%m-%d_%H-%M-%S')
                 )
                 fn_base = re.sub(ur'[:\*\?"<>\| ]+', '_', fn_base, re.U)
+                fn_base = force_str(fn_base)
                 fn = self._get_fn(fn_base)
                 n = 1
                 while os.path.exists(fn):
@@ -72,6 +74,7 @@ class DebuggingServer(SMTPServer):
                 if DJU_EMAIL_DEBUG_IN_CONSOLE:
                     print line
         except Exception, e:
+            traceback.print_exc()
             print 'DebuggingServer error: {}'.format(force_unicode(e))
 
 
