@@ -3,10 +3,10 @@ import os
 import urllib
 import urlparse
 import simplejson
+from wsgiref.util import FileWrapper
 from django.contrib.sites.models import Site
 from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import resolve_url
-from django.core.servers.basehttp import FileWrapper
 from . import settings as dju_settings
 
 
