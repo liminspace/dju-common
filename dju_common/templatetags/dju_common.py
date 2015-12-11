@@ -231,6 +231,7 @@ def assign_default(context, var_name, default):
     """
     if var_name not in context:
         context[var_name] = default
+    return ''
 
 
 @register.assignment_tag
