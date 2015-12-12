@@ -1,4 +1,4 @@
-django<1.9
+django<1.10
 simplejson==3.8.1
 django-redis==4.3.0
 pytz==2015.7

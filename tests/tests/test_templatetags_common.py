@@ -1,3 +1,9 @@
+try:
+    from html import unescape  # python 3.4+
+except ImportError:
+    from HTMLParser import HTMLParser  # python 2.x
+    unescape = HTMLParser().unescape
+
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator
 from django.http import QueryDict
@@ -220,6 +226,13 @@ class TestTemplatetagsCommon(TestCase):
         t = self.get_tpl_f("{% assign 'abc' as v %}{{ v }}")
         self.assertEqual(t(), 'abc')
 
+    def test_assign_default(self):
+        t = self.get_tpl_f("{% assign_default 'v' 'default' %}{{ v }}")
+        self.assertEqual(t(), 'default')
+
+        t = self.get_tpl_f("{% assign_default 'v' 'default' %}{{ v }}", {'v': 'value'})
+        self.assertEqual(t(), 'value')
+
     def test_assign_format_str(self):
         t = self.get_tpl_f("{% assign_format_str 'a_{:.1f}' 1 as v %}{{ v }}")
         self.assertEqual(t(), 'a_1.0')
@@ -352,30 +365,30 @@ class TestTemplatetagsCommon(TestCase):
 
     def test_url_getvars(self):
         t = self.get_tpl_f('{% url_getvars %}', {'request': self.R('a=1&b=2&b=3')})
-        self.assertEqual(QueryDict(t()), QueryDict('a=1&b=2&b=3'))
+        self.assertEqual(QueryDict(unescape(t())), QueryDict('a=1&b=2&b=3'))
 
     def test_url_getvars_with(self):
         t = self.get_tpl_f("{% url_getvars_with 'b,c' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
-        self.assertEqual(QueryDict(t()), QueryDict('b=2&b=3&c=4'))
+        self.assertEqual(QueryDict(unescape(t())), QueryDict('b=2&b=3&c=4'))
 
         t = self.get_tpl_f("{% url_getvars_with '&b,c' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
         self.assertTrue(t().startswith('&'))
 
         t = self.get_tpl_f("{% url_getvars_with 'b,c&' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
-        self.assertTrue(t().endswith('&'))
+        self.assertTrue(unescape(t()).endswith('&'))
 
         t = self.get_tpl_f("{% url_getvars_with '&b,c&' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
-        self.assertTrue(t().startswith('&') and t().endswith('&'))
+        self.assertTrue(unescape(t()).startswith('&') and unescape(t()).endswith('&'))
 
         t = self.get_tpl_f("{% url_getvars_with '' %}", {'request': self.R('a=1&b=2&b=3')})
         self.assertEqual(t(), '')
 
     def test_url_getvars_without(self):
         t = self.get_tpl_f("{% url_getvars_without 'a,c' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
-        self.assertEqual(QueryDict(t()), QueryDict('b=2&b=3'))
+        self.assertEqual(QueryDict(unescape(t())), QueryDict('b=2&b=3'))
 
         t = self.get_tpl_f("{% url_getvars_without '' %}", {'request': self.R('a=1&b=2&b=3&c=4')})
-        self.assertEqual(QueryDict(t()), QueryDict('a=1&b=2&b=3&c=4'))
+        self.assertEqual(QueryDict(unescape(t())), QueryDict('a=1&b=2&b=3&c=4'))
 
     def test_full_url_prefix(self):
         r = '{scheme}://' + Site.objects.get_current().domain

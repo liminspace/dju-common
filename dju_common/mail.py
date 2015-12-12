@@ -1,3 +1,4 @@
+import copy
 import re
 from django.core.mail import EmailMultiAlternatives
 from django.template import RequestContext
@@ -100,7 +101,7 @@ class RenderMailSender(object):
             if self._context:
                 self._context_instance.update(self._context)
 
-    def _render_template_block(self, name, nodes=None, extended_blocks=None):
+    def _render_template_block(self, name, nodes=None, extended_blocks=None, context_instance=None):
         if nodes is None:
             nodes = self._tpl.template.nodelist
         if extended_blocks is None:
@@ -110,18 +111,19 @@ class RenderMailSender(object):
                 for i, n in enumerate(node.nodelist):
                     if isinstance(n, BlockNode) and n.name in extended_blocks:
                         node.nodelist[i] = extended_blocks[n.name]
-                return node.render(self._context_instance)
+                return node.render(context_instance)
             if hasattr(node, 'nodelist'):
                 try:
-                    return self._render_template_block(name, nodes=node.nodelist, extended_blocks=extended_blocks)
+                    return self._render_template_block(name, nodes=node.nodelist, extended_blocks=extended_blocks,
+                                                       context_instance=context_instance)
                 except self.TemplateNodeNotFound:
                     pass
             if isinstance(node, ExtendsNode):
                 eb = dict((n.name, n) for n in node.nodelist if isinstance(n, BlockNode))
                 eb.update(extended_blocks)
                 try:
-                    return self._render_template_block(name, nodes=node.get_parent(self._context_instance),
-                                                       extended_blocks=eb)
+                    return self._render_template_block(name, nodes=node.get_parent(context_instance),
+                                                       extended_blocks=eb, context_instance=context_instance)
                 except self.TemplateNodeNotFound:
                     pass
         raise self.TemplateNodeNotFound('Block "%s" not found.' % name)
@@ -130,9 +132,13 @@ class RenderMailSender(object):
         if name not in self._render_cache:
             if self._context_instance is not None:
                 with self._context_instance.bind_template(self._tpl.template):
-                    self._render_cache[name] = self._render_template_block(name).strip()
+                    self._render_cache[name] = self._render_template_block(
+                            name, context_instance=copy.deepcopy(self._context_instance)
+                    ).strip()
             else:
-                self._render_cache[name] = self._render_template_block(name).strip()
+                self._render_cache[name] = self._render_template_block(
+                        name, context_instance=Context()
+                ).strip()
         return self._render_cache[name]
 
     @classmethod

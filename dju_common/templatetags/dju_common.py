@@ -227,7 +227,7 @@ def assign(value):
 @register.simple_tag(takes_context=True)
 def assign_default(context, var_name, default):
     """
-    Sets default value to variable id one does not exist.
+    Sets default value to variable if one does not exist.
     """
     if var_name not in context:
         context[var_name] = default
