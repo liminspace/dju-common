@@ -43,7 +43,7 @@ def is_in(val, items):
     {% if tag|is_in:tags_list %}is block tag{% endif %}
     """
     if isinstance(items, basestring):
-        arg = items.split('|')
+        items = items.split('|')
     return val in items
 
 
@@ -215,7 +215,7 @@ def int_subtract(a, b):
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def assign(value):
     """
     Setting value to a variable.
@@ -234,7 +234,7 @@ def assign_default(context, var_name, default):
     return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def assign_format_str(string, *args, **kwargs):
     """
     Format string and save it to variable.
