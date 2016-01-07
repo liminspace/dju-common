@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from modeltranslation.settings import AVAILABLE_LANGUAGES
 
 
