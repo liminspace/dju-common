@@ -1,14 +1,8 @@
 from django import forms
-from .helpers import add_css_class_to_field
+from .helpers import add_css_class_to_fields_widget
 
 
 BS_FORM_WIDGETS = (forms.TextInput, forms.Textarea, forms.Select, forms.FileInput)
-
-
-def add_css_class_to_fields_widget(form_fields, css_class, widget_types=BS_FORM_WIDGETS):
-    for k in form_fields:
-        if isinstance(form_fields[k].widget, widget_types):
-            add_css_class_to_field(form_fields[k], css_class)
 
 
 class BootstrapForm(forms.Form):
