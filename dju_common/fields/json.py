@@ -83,6 +83,8 @@ class JSONFieldBase(models.Field):
 
     def to_python(self, value):
         if isinstance(value, basestring):
+            if value == '':
+                return None
             try:
                 return simplejson.loads(value, **self.load_kwargs)
             except ValueError:
@@ -90,7 +92,7 @@ class JSONFieldBase(models.Field):
         return value
 
     def from_db_value(self, value, expression, connection, context):
-        if value is None:
+        if value in (None, ''):
             return None
         return simplejson.loads(value, **self.load_kwargs)
 
