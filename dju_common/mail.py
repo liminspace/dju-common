@@ -132,12 +132,14 @@ class RenderMailSender(object):
         if name not in self._render_cache:
             if self._context_instance is not None:
                 with self._context_instance.bind_template(self._tpl.template):
+                    ci = copy.deepcopy(self._context_instance)
+                    ci._current_app = self._context_instance._current_app
                     self._render_cache[name] = self._render_template_block(
-                            name, context_instance=copy.deepcopy(self._context_instance)
+                        name, context_instance=ci
                     ).strip()
             else:
                 self._render_cache[name] = self._render_template_block(
-                        name, context_instance=Context()
+                    name, context_instance=Context()
                 ).strip()
         return self._render_cache[name]
 

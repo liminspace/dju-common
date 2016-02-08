@@ -1,6 +1,8 @@
 # coding=utf-8
+import traceback
 import pytz
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.core import mail
 from django.utils import timezone
@@ -118,3 +120,13 @@ class TestRenderMailSender(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, settings.EMAIL_SUBJECT_PREFIX + 'Test subject 4')
         self.assertTrue('STATIC_CP_VALUE_OK' in mail.outbox[0].body)
+
+    def test_render_mail_and_url_tag(self):
+        t = RenderMailSender('mail/test5.html')
+        try:
+            t.send('test9@mail.com')
+        except AttributeError, e:
+            traceback.print_exc()
+            raise self.failureException('URL tag error.')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(reverse('test_page'), mail.outbox[0].body)

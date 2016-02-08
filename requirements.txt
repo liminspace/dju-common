@@ -3,3 +3,4 @@ simplejson==3.8.1
 django-redis==4.3.0
 pytz==2015.7
 coverage==4.0.3
+wheel==0.29.0

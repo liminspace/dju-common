@@ -1,0 +1,17 @@
+{% extends 'mail/base.html' %}
+
+
+{% block subject %}Test subject 5{% endblock %}
+
+
+{% block plain_body %}
+    {% url 'test_page' %}
+{% endblock %}
+
+
+{% block html_body %}
+    <p>
+        {% url 'test_page' as url %}
+        <a href="{{ url }}">{{ url }}</a>
+    </p>
+{% endblock %}
