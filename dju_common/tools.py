@@ -11,10 +11,12 @@ from django.utils.translation import ugettext_lazy as _
 from . import settings as dju_settings
 
 
-def natural_sorted(iterable, cmp_func=None, reverse=False):
+def natural_sorted(iterable, key=None, cmp_func=None, reverse=False):
     reg = re.compile(r'([0-9]+)')
     convert = lambda text: int(text) if text.isdigit() else text.lower()
-    alphanum_key = lambda key: [convert(c) for c in reg.split(key)]
+    if key is None:
+        key = lambda t: t
+    alphanum_key = lambda val: [convert(c) for c in reg.split(key(val))]
     return sorted(iterable, key=alphanum_key, cmp=cmp_func, reverse=reverse)
 
 
