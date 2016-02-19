@@ -1,4 +1,5 @@
 # coding=utf-8
+import gc
 from django.shortcuts import _get_queryset
 
 
@@ -15,39 +16,36 @@ def get_object_or_None(klass, *args, **kwargs):
         return None
 
 
-def chunked_qs(qs, chunksize=1000, yield_values=True):
-    start = 0
-    while True:
+def chunked_qs(qs, order_by='pk', chunksize=1000, yield_values=True):
+    qs = qs.order_by(order_by)
+    if order_by.startswith('-'):
+        fn = 'lt'
+        ord_field = order_by[1:]
+    else:
+        fn = 'gt'
+        ord_field = order_by
+    last_ordered_val = None
+    empty = False
+    while not empty:
         empty = True
+        chunk_qs = qs
+        if last_ordered_val is not None:
+            chunk_qs = chunk_qs.filter(**{'{}__{}'.format(ord_field, fn): last_ordered_val})
+        chunk_qs = chunk_qs[:chunksize]
         if yield_values:
-            for t in qs[start:(start + chunksize)]:
-                yield t
+            row = None
+            for row in chunk_qs:
+                yield row
+            if row is not None:
+                last_ordered_val = getattr(row, ord_field)
                 empty = False
         else:
-            data = tuple(qs[start:(start + chunksize)])
-            yield data
-            if data:
+            rows = tuple(chunk_qs)
+            yield rows
+            if rows:
+                last_ordered_val = getattr(rows[-1], ord_field)
                 empty = False
-        if empty:
-            break
-        start += chunksize
-
-
-def chunked_qs_by_field(qs, fieldname, chunksize=1000):
-    """
-    Буде зроблено кілька запитів, які будуть пагінуватись з допомогою фільтру
-    по числовому полю fieldname (значенням від 0 шматками chunksize)
-    """
-    start = 0
-    while True:
-        empty = True
-        f = {'{f}__gte'.format(f=fieldname): start, '{f}__lt'.format(f=fieldname): start + chunksize}
-        for t in qs.filter(**f):
-            yield t
-            empty = False
-        if empty:
-            break
-        start += chunksize
+        gc.collect()
 
 
 def each_fields(for_fields, fields):
