@@ -1,14 +1,13 @@
 import copy
 import re
 from django.core.mail import EmailMultiAlternatives
-from django.template import RequestContext
-from django.template import loader, Context
+from django.template import loader
 from django.template.loader import render_to_string
-from django.template.loader_tags import BlockNode, ExtendsNode
 from django.conf import settings
 from django.utils import translation, timezone
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
+from .constants import DJU_EMAIL_BLOCK_MARKERS
 from . import settings as dju_settings
 
 
@@ -42,8 +41,13 @@ def send_mail(subject, body, to, from_email=None, reply_to=None,
 
 class RenderMailSender(object):
     TEMPLATE_EXT = '.html'
+    BLOCKS_RE = {
+        'subject': re.compile(r'{}(.*?){}'.format(*DJU_EMAIL_BLOCK_MARKERS['subject']), re.U | re.S),
+        'plain_body': re.compile(r'{}(.*?){}'.format(*DJU_EMAIL_BLOCK_MARKERS['plain_body']), re.U | re.S),
+        'html_body': re.compile(r'{}(.*?){}'.format(*DJU_EMAIL_BLOCK_MARKERS['html_body']), re.U | re.S),
+    }
 
-    class TemplateNodeNotFound(Exception):
+    class TemplateEmailTagNotFound(Exception):
         pass
 
     def __init__(self, tpl_fn, context=None, request=None, from_email=None, reply_to=None,
@@ -64,84 +68,39 @@ class RenderMailSender(object):
                        fail_silently=fail_silently, attach_alternative=attach_alternative, attaches=attaches,
                        lang=lang, tz=tz)
         self._tpl = None
-        self._context_instance = None
         self._lang_old = None
         self._tz_old = None
-        self._render_cache = {}
+        self._render_cache = None
+        self._context_cache = None
 
     def configure(self, **kwargs):
         for k, v in kwargs.iteritems():
             if k not in self._allow_configs:
                 raise AttributeError('Unknown attr "%s"' % k)
             setattr(self, '_' + k, v)
-            if k in ('tpl_fn', 'lang'):
+            if k in ('tpl_fn', 'lang', 'tz'):
                 self._tpl = None
-                self._render_cache = {}
+                self._render_cache = None
             elif k in ('request', 'context'):
-                self._context_instance = None
-                self._render_cache = {}
+                self._context_cache = None
+                self._render_cache = None
 
-    def _load_tpl(self):
+    def _get_tpl(self):
         if self._tpl is None:
             self._tpl = loader.select_template((
                 '{fn}_{lang}{ext}'.format(fn=self._tpl_fn, lang=translation.get_language(), ext=self.TEMPLATE_EXT),
                 '{fn}{ext}'.format(fn=self._tpl_fn, ext=self.TEMPLATE_EXT),
                 self._tpl_fn,
             ))
+        return self._tpl
 
-    def _create_context_instance(self):
-        if self._context_instance is None:
-            if self._request:
-                self._context_instance = RequestContext(self._request)
-            else:
-                dc = dju_settings.DJU_EMAIL_DEFAULT_CONTEXT
-                self._context_instance = Context(
-                    import_string(dc)() if dc else None
-                )
-            if self._context:
-                self._context_instance.update(self._context)
-
-    def _render_template_block(self, name, nodes=None, extended_blocks=None, context_instance=None):
-        if nodes is None:
-            nodes = self._tpl.template.nodelist
-        if extended_blocks is None:
-            extended_blocks = {}
-        for node in nodes:
-            if isinstance(node, BlockNode) and node.name == name:
-                for i, n in enumerate(node.nodelist):
-                    if isinstance(n, BlockNode) and n.name in extended_blocks:
-                        node.nodelist[i] = extended_blocks[n.name]
-                return node.render(context_instance)
-            if hasattr(node, 'nodelist'):
-                try:
-                    return self._render_template_block(name, nodes=node.nodelist, extended_blocks=extended_blocks,
-                                                       context_instance=context_instance)
-                except self.TemplateNodeNotFound:
-                    pass
-            if isinstance(node, ExtendsNode):
-                eb = dict((n.name, n) for n in node.nodelist if isinstance(n, BlockNode))
-                eb.update(extended_blocks)
-                try:
-                    return self._render_template_block(name, nodes=node.get_parent(context_instance),
-                                                       extended_blocks=eb, context_instance=context_instance)
-                except self.TemplateNodeNotFound:
-                    pass
-        raise self.TemplateNodeNotFound('Block "%s" not found.' % name)
-
-    def _render(self, name):
-        if name not in self._render_cache:
-            if self._context_instance is not None:
-                with self._context_instance.bind_template(self._tpl.template):
-                    ci = copy.deepcopy(self._context_instance)
-                    ci._current_app = self._context_instance._current_app
-                    self._render_cache[name] = self._render_template_block(
-                        name, context_instance=ci
-                    ).strip()
-            else:
-                self._render_cache[name] = self._render_template_block(
-                    name, context_instance=Context()
-                ).strip()
-        return self._render_cache[name]
+    def _get_context(self):
+        if self._context_cache is None:
+            self._context_cache = {} if self._context is None else copy.copy(self._context)
+            if not self._request:
+                if dju_settings.DJU_EMAIL_DEFAULT_CONTEXT:
+                    self._context_cache.update(import_string(dju_settings.DJU_EMAIL_DEFAULT_CONTEXT)())
+        return self._context_cache
 
     @classmethod
     def _plain_normalize(cls, plain):
@@ -173,11 +132,26 @@ class RenderMailSender(object):
             to = (to,)
         self._set_locale()
         try:
-            self._load_tpl()
-            self._create_context_instance()
+            if self._render_cache is None:
+                tpl = self._get_tpl()
+                r = tpl.render(context=self._get_context(), request=self._request)
+                for block, markers in DJU_EMAIL_BLOCK_MARKERS.iteritems():
+                    for marker in markers:
+                        if marker not in r:
+                            raise self.TemplateEmailTagNotFound('Require tag not used: dju_email_{}.'.format(block))
+                contents = {
+                    'subject': self.BLOCKS_RE['subject'].search(r).group(1).strip(),
+                    'plain_body': self._plain_normalize(self.BLOCKS_RE['plain_body'].search(r).group(1).strip()),
+                    'html_body': self.BLOCKS_RE['html_body'].search(r).group(1).strip(),
+                }
+                self._render_cache = contents
+                del r
+            else:
+                contents = self._render_cache
             attach_alternative = tuple(self._attach_alternative) if self._attach_alternative else ()
-            attach_alternative += ((self._render('html'), 'text/html'),)
-            return send_mail(self._render('subject'), self._plain_normalize(self._render('plain')), to,
+            if contents['html_body']:
+                attach_alternative += ((contents['html_body'], 'text/html'),)
+            return send_mail(contents['subject'], contents['plain_body'], to,
                              from_email=self._from_email, reply_to=self._reply_to, fail_silently=self._fail_silently,
                              attach_alternative=attach_alternative, attaches=self._attaches)
         finally:

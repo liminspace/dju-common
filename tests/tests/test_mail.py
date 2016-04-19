@@ -1,5 +1,4 @@
 # coding=utf-8
-import traceback
 import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -43,22 +42,22 @@ class TestRenderMailSender(TestCase):
         self.assertEqual(mail.outbox[0].subject, settings.EMAIL_SUBJECT_PREFIX + 'Test subject 1 test')
 
     def test_configure(self):
-        for kw in ({'tpl_fn': 'mail/test1.html'}, {'lang': 'en'}):
+        for kw in ({'tpl_fn': 'mail/test1.html'}, {'lang': 'en'}, {'tz': 'Europe/London'}):
             t = RenderMailSender('mail/test1.html')
             t.send('test3@mail.com')
             self.assertIsNotNone(t._tpl)
-            self.assertNotEqual(len(t._render_cache), 0)
+            self.assertIsNotNone(t._render_cache)
             t.configure(**kw)
             self.assertIsNone(t._tpl)
-            self.assertEqual(len(t._render_cache), 0)
+            self.assertIsNone(t._render_cache)
         for kw in ({'request': 'Request'}, {'context': {'a': 1}}):
             t = RenderMailSender('mail/test1.html')
             t.send('test3@mail.com')
-            self.assertIsNotNone(t._context_instance)
-            self.assertNotEqual(len(t._render_cache), 0)
+            self.assertIsNotNone(t._context_cache)
+            self.assertIsNotNone(t._render_cache)
             t.configure(**kw)
-            self.assertIsNone(t._context_instance)
-            self.assertEqual(len(t._render_cache), 0)
+            self.assertIsNone(t._context_cache)
+            self.assertIsNone(t._render_cache)
         t = RenderMailSender('mail/test1.html')
         with self.assertRaises(AttributeError):
             t.configure(abracadabra=1)
@@ -101,11 +100,10 @@ class TestRenderMailSender(TestCase):
         self.assertTrue(u'Номер телефону' in mail.outbox[0].body)
 
     def test_render_mail_render_error(self):
-        t = RenderMailSender('mail/test3.html')
-        t._load_tpl()
-        t._create_context_instance()
-        with self.assertRaises(t.TemplateNodeNotFound):
-            t._render('abracadabra')
+        for i in xrange(1, 4):
+            t = RenderMailSender('mail/test_invalid_{}.html'.format(i))
+            with self.assertRaises(t.TemplateEmailTagNotFound):
+                t.send('testerror{}@mail.com'.format(i))
 
     def test_render_mail_context_proccessors_without_request(self):
         t = RenderMailSender('mail/test4.html')
@@ -123,10 +121,17 @@ class TestRenderMailSender(TestCase):
 
     def test_render_mail_and_url_tag(self):
         t = RenderMailSender('mail/test5.html')
-        try:
-            t.send('test9@mail.com')
-        except AttributeError, e:
-            traceback.print_exc()
-            raise self.failureException('URL tag error.')
+        t.send('test9@mail.com')
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(reverse('test_page'), mail.outbox[0].body)
+
+    def test_render_mail_using_cache(self):
+        t = RenderMailSender('mail/test1.html')
+        self.assertIsNone(t._render_cache)
+        self.assertIsNone(t._context_cache)
+        t.send('test10@mail.com')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIsNotNone(t._render_cache)
+        self.assertIsNotNone(t._context_cache)
+        t.send('test10@mail.com')
+        self.assertEqual(len(mail.outbox), 2)
