@@ -14,23 +14,25 @@ JSON_INVALID = ValidationError(_('Enter valid JSON.'))
 
 
 class JSONFormField(CharField):
-    load_kwargs = None
-    dump_kwargs = None
+    def __init__(self, *args, **kwargs):
+        self.load_kwargs = kwargs.pop('load_kwargs', {})
+        self.dump_kwargs = kwargs.pop('dump_kwargs', {})
+        super(JSONFormField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         if not value and not self.required:
             return None
         if isinstance(value, basestring):
             try:
-                value = simplejson.loads(value, **(self.load_kwargs or {}))
+                value = simplejson.loads(value, **self.load_kwargs)
             except ValueError:
                 raise JSON_INVALID
         return value
 
     def prepare_value(self, value):
         if isinstance(value, basestring):
-            value = simplejson.loads(value, **(self.load_kwargs or {}))
-        kwargs = (self.dump_kwargs or {}).copy()
+            value = simplejson.loads(value, **self.load_kwargs)
+        kwargs = self.dump_kwargs.copy()
         kwargs['sort_keys'] = True
         if isinstance(self.widget, Textarea):
             kwargs['indent'] = 4
