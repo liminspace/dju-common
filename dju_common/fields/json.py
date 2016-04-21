@@ -72,12 +72,12 @@ class JSONFieldBase(models.Field):
             raise AssertionError('Default can be None, list or dict.')
         if 'blank' not in kwargs:
             kwargs['blank'] = True
-        self.use_decimal = kwargs.pop('use_decimal', False)
+        use_decimal = kwargs.pop('use_decimal', False)
         self.dump_kwargs = {'cls': JSONEncoder,
                             'separators': self.DEFAULT_SEPARATORS,
-                            'use_decimal': self.use_decimal}
+                            'use_decimal': use_decimal}
         self.dump_kwargs.update(kwargs.pop('dump_kwargs', {}))
-        self.load_kwargs = {'use_decimal': self.use_decimal}
+        self.load_kwargs = {'use_decimal': use_decimal}
         self.load_kwargs.update(kwargs.pop('load_kwargs', {}))
         super(JSONFieldBase, self).__init__(*args, **kwargs)
 
@@ -114,6 +114,12 @@ class JSONFieldBase(models.Field):
             field.load_kwargs = self.load_kwargs
             field.dump_kwargs = self.dump_kwargs
         return field
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(JSONFieldBase, self).deconstruct()
+        kwargs['dump_kwargs'] = self.dump_kwargs
+        kwargs['load_kwargs'] = self.load_kwargs
+        return name, path, args, kwargs
 
 
 class JSONField(JSONFieldBase, models.TextField):
