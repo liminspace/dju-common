@@ -32,11 +32,12 @@ class Command(BaseCommand):
                 path = settings.BASE_DIR
             else:
                 path = os.path.abspath(project_apps.app_configs[app].path)
+            assert os.path.isdir(path)
             if not path.startswith(settings.BASE_DIR):
                 if apps:
                     raise CommandError('App "%s" is not in project path.' % app)
                 continue
-            if not os.path.exists(os.path.join(path, 'locale').replace('\\', '/')):
+            if not os.path.isdir(os.path.join(path, 'locale').replace('\\', '/')):
                 self.stdout.write('App "%s" ignore because locale path not found.' % app)
                 continue
             result.append(path)
@@ -45,15 +46,17 @@ class Command(BaseCommand):
         return list(set(result))
 
     @staticmethod
-    def _get_project_apps_with_locale():
-        apps = []
+    def _get_paths_of_apps_with_locale():
+        result = []
         for app in project_apps.app_configs.values():
-            if not app.path.startswith(settings.BASE_DIR):
+            app_path = os.path.abspath(app.path)
+            assert os.path.isdir(app_path)
+            if not app_path.startswith(settings.BASE_DIR):
                 continue
-            if not os.path.exists(os.path.join(app.path, 'locale').replace('\\', '/')):
+            if not os.path.isdir(os.path.join(app_path, 'locale').replace('\\', '/')):
                 continue
-            apps.append(app.label)
-        return apps
+            result.append(app_path.rstrip('/'))
+        return result
 
     @staticmethod
     def _make_locale_dirs(path):
@@ -89,8 +92,8 @@ class Command(BaseCommand):
                 if extensions:
                     command.extend(['-e', ','.join(extensions)])
                 if path == settings.BASE_DIR:
-                    for app in self._get_project_apps_with_locale():
-                        command.extend(['-i', app])
+                    for app_path in self._get_paths_of_apps_with_locale():
+                        command.extend(['-i', '{}/*'.format(app_path)])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
                 subprocess.call(command)

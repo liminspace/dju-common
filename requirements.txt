@@ -1,6 +1,6 @@
 django<1.10
 simplejson==3.8.2
-django-redis==4.4.2
-pytz==2016.3
-coverage==4.0.3
+django-redis==4.4.3
+pytz==2016.4
+coverage==4.1
 wheel==0.29.0

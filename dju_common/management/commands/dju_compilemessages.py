@@ -17,9 +17,10 @@ class Command(BaseCommand):
                 path = settings.BASE_DIR
             else:
                 path = os.path.abspath(project_apps.app_configs[app].path)
+            assert os.path.isdir(path)
             if not path.startswith(settings.BASE_DIR):
                 continue
-            if not os.path.exists(os.path.join(path, 'locale').replace('\\', '/')):
+            if not os.path.isdir(os.path.join(path, 'locale').replace('\\', '/')):
                 continue
             result.append(path)
         if not result:
