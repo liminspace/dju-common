@@ -1,7 +1,10 @@
-{% block subject %}Test email from {{ SITE.domain }}{% endblock %}
+{% load dju_email %}
 
 
-{% block plain %}
+{% dju_email_subject %}Test email from {{ SITE.domain }}{% end_dju_email_subject %}
+
+
+{% dju_email_plain_body %}
     Hi!
 
     This is the test email. It helps to test sending email from Your project.
@@ -10,10 +13,10 @@
 
     --------
     Please don't reply to this email.
-{% endblock %}
+{% end_dju_email_plain_body %}
 
 
-{% block html %}
+{% dju_email_html_body %}
     <!DOCTYPE html>
     <html>
     <head></head>
@@ -32,4 +35,4 @@
         </p>
     </body>
     </html>
-{% endblock %}
+{% end_dju_email_html_body %}

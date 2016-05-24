@@ -16,20 +16,20 @@ class EmailBlockNode(template.Node):
 
 @register.tag
 def dju_email_subject(parser, token):
-    nodelist = parser.parse(('enddju_email_subject',))
+    nodelist = parser.parse(('enddju_email_subject', 'end_dju_email_subject'))
     parser.delete_first_token()
     return EmailBlockNode(nodelist, DJU_EMAIL_BLOCK_MARKERS['subject'])
 
 
 @register.tag
 def dju_email_plain_body(parser, token):
-    nodelist = parser.parse(('enddju_email_plain_body',))
+    nodelist = parser.parse(('enddju_email_plain_body', 'end_dju_email_plain_body'))
     parser.delete_first_token()
     return EmailBlockNode(nodelist, DJU_EMAIL_BLOCK_MARKERS['plain_body'])
 
 
 @register.tag
 def dju_email_html_body(parser, token):
-    nodelist = parser.parse(('enddju_email_html_body',))
+    nodelist = parser.parse(('enddju_email_html_body', 'end_dju_email_html_body'))
     parser.delete_first_token()
     return EmailBlockNode(nodelist, DJU_EMAIL_BLOCK_MARKERS['html_body'])
