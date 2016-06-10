@@ -42,4 +42,4 @@ DJU_GRAVATAR_DEFAULT_SIZE = getattr(settings, 'DJU_GRAVATAR_DEFAULT_SIZE', 50)
 # 404, mm, identicon, monsterid, wavatar, retro, blank, http://mysite.com/default.jpg
 DJU_GRAVATAR_DEFAULT_IMAGE = getattr(settings, 'DJU_GRAVATAR_DEFAULT_IMAGE', 'mm')
 DJU_GRAVATAR_RATING = getattr(settings, 'DJU_GRAVATAR_RATING', 'g')  # g, pg, r, x
-DJU_GRAVATAR_SECURE = getattr(settings, 'DJU_GRAVATAR_SECURE', False)
+DJU_GRAVATAR_SECURE = getattr(settings, 'DJU_GRAVATAR_SECURE', USE_HTTPS)
