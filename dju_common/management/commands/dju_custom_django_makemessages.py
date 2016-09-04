@@ -14,7 +14,6 @@ class Command(makemessages.Command):
 
     def find_files(self, root):
         files = super(Command, self).find_files(root)
-        print 'FILES 1', files
         for d in self.additional_source_dirs:
             if ':' in d:
                 src_dir, locale_dir = d.split(':', 1)
@@ -25,5 +24,4 @@ class Command(makemessages.Command):
                 for add_file in add_files:
                     add_file.locale_dir = locale_dir
             files.extend(add_files)
-        print 'FILES 2', files
         return sorted(files)
