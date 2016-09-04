@@ -1,3 +1,5 @@
+import os
+
 from django.core.management.commands import makemessages
 
 
@@ -19,9 +21,10 @@ class Command(makemessages.Command):
                 src_dir, locale_dir = d.split(':', 1)
             else:
                 src_dir, locale_dir = d, None
-            add_files = super(Command, self).find_files(src_dir)
-            if locale_dir:
-                for add_file in add_files:
+            add_files = super(Command, self).find_files(os.path.abspath(src_dir))
+            for add_file in add_files:
+                add_file.dirpath = os.path.relpath(add_file.dirpath, os.getcwd())
+                if locale_dir:
                     add_file.locale_dir = locale_dir
             files.extend(add_files)
         return sorted(files)
