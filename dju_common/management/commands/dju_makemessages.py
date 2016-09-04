@@ -81,6 +81,7 @@ class Command(BaseCommand):
             command_base.append('-a')
         if not options['domain']:
             options['domain'] = ['django', 'djangojs']
+        rel_path = lambda p: os.path.relpath(p, settings.BASE_DIR)
         for path in paths:
             os.chdir(path)
             for domain in options['domain']:
@@ -95,7 +96,7 @@ class Command(BaseCommand):
                 if extensions:
                     command.extend(['-e', ','.join(extensions)])
                 if path == settings.BASE_DIR:
-                    rel_path = lambda p: os.path.relpath(p, path)
+
                     for app_path in self._get_paths_of_apps_with_locale():
                         command.extend(['-i', '{}/*'.format(rel_path(app_path))])
                     if self.SPLIT_TEMPLATE_APP_DIR:  # exclude templates/appname
@@ -110,16 +111,20 @@ class Command(BaseCommand):
                             )])
                 else:
                     locale_dir = os.path.join(path, 'locale')
-                    locale_dir_suffix = ':{}'.format(locale_dir) if os.path.isdir(locale_dir) else ''
+                    locale_dir_suffix = ':{}'.format(rel_path(locale_dir)) if os.path.isdir(locale_dir) else ''
                     if self.SPLIT_TEMPLATE_APP_DIR:  # include templae/appname
                         command.extend([
                             '--add-source-dir',
-                            os.path.join(settings.BASE_DIR, 'templates', os.path.basename(path)) + locale_dir_suffix,
+                            rel_path(
+                                os.path.join(settings.BASE_DIR, 'templates', os.path.basename(path))
+                            ) + locale_dir_suffix,
                         ])
                     if self.SPLIT_STATIC_APP_DIR:  # include static/appname
                         command.extend([
                             '--add-source-dir',
-                            os.path.join(settings.BASE_DIR, 'static', os.path.basename(path)) + locale_dir_suffix,
+                            rel_path(
+                                os.path.join(settings.BASE_DIR, 'static', os.path.basename(path))
+                            ) + locale_dir_suffix,
                         ])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
