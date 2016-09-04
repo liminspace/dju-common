@@ -9,15 +9,12 @@ class Command(makemessages.Command):
 
     def handle(self, *args, **options):
         self.additional_source_dirs = options['additional_source_dirs']
-        # if options['additional_source_dirs']:
-        #     self.xgettext_options = (
-        #         makemessages.Command.xgettext_options +
-        #         ['--directory={}'.format(d) for d in options['additional_source_dirs']]
-        #     )
         super(Command, self).handle(*args, **options)
 
     def find_files(self, root):
         files = super(Command, self).find_files(root)
+        print 'FILES 1', files
         for d in self.additional_source_dirs:
             files.extend(super(Command, self).find_files(d))
+        print 'FILES 2', files
         return sorted(files)
