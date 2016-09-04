@@ -81,9 +81,9 @@ class Command(BaseCommand):
             command_base.append('-a')
         if not options['domain']:
             options['domain'] = ['django', 'djangojs']
-        rel_path = lambda p: os.path.relpath(p, settings.BASE_DIR)
         for path in paths:
             os.chdir(path)
+            rel_path = lambda p: os.path.relpath(p, path)
             for domain in options['domain']:
                 command = copy(command_base)
                 extensions = copy(options['extensions'])
@@ -96,7 +96,6 @@ class Command(BaseCommand):
                 if extensions:
                     command.extend(['-e', ','.join(extensions)])
                 if path == settings.BASE_DIR:
-
                     for app_path in self._get_paths_of_apps_with_locale():
                         command.extend(['-i', '{}/*'.format(rel_path(app_path))])
                     if self.SPLIT_TEMPLATE_APP_DIR:  # exclude templates/appname
