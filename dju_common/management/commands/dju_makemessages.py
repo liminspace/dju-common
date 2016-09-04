@@ -10,6 +10,8 @@ from django.apps.registry import apps as project_apps
 
 class Command(BaseCommand):
     help = 'Make locale .po files for applications of project.'
+    SPLIT_TEMPLATE_APP_DIR = True
+    SPLIT_STATIC_APP_DIR = True
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
@@ -70,7 +72,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         paths = self._get_paths_of_apps(options['apps'])
-        command_base = [sys.executable, os.path.join(settings.BASE_DIR, 'manage.py').replace('\\', '/'), 'makemessages']
+        command_base = [sys.executable, os.path.join(settings.BASE_DIR, 'manage.py').replace('\\', '/'),
+                        'dju_custom_django_makemessages']
         if options['locale']:
             for lang in options['locale']:
                 command_base.extend(['-l', lang])
@@ -94,6 +97,25 @@ class Command(BaseCommand):
                 if path == settings.BASE_DIR:
                     for app_path in self._get_paths_of_apps_with_locale():
                         command.extend(['-i', '{}/*'.format(app_path)])
+                    if self.SPLIT_TEMPLATE_APP_DIR:  # exclude templates/appname
+                        for app_path in self._get_paths_of_apps_with_locale():
+                            command.extend(['-i', '{}/*'.format(
+                                os.path.join(settings.BASE_DIR, 'templates', os.path.basename(app_path))
+                            )])
+                    if self.SPLIT_STATIC_APP_DIR:  # exclude static/appname
+                        for app_path in self._get_paths_of_apps_with_locale():
+                            command.extend(['-i', '{}/*'.format(
+                                os.path.join(settings.BASE_DIR, 'static', os.path.basename(app_path))
+                            )])
+                else:
+                    if self.SPLIT_TEMPLATE_APP_DIR:  # include templae/appname
+                        for app_path in self._get_paths_of_apps_with_locale():
+                            command.extend(['--source-dir',
+                                            os.path.join(settings.BASE_DIR, 'templates', os.path.basename(app_path))])
+                    if self.SPLIT_STATIC_APP_DIR:  # include static/appname
+                        for app_path in self._get_paths_of_apps_with_locale():
+                            command.extend(['--source-dir',
+                                            os.path.join(settings.BASE_DIR, 'static', os.path.basename(app_path))])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
                 subprocess.call(command)
