@@ -109,13 +109,11 @@ class Command(BaseCommand):
                             )])
                 else:
                     if self.SPLIT_TEMPLATE_APP_DIR:  # include templae/appname
-                        for app_path in self._get_paths_of_apps_with_locale():
-                            command.extend(['--source-dir',
-                                            os.path.join(settings.BASE_DIR, 'templates', os.path.basename(app_path))])
+                        command.extend(['--source-dir',
+                                        os.path.join(settings.BASE_DIR, 'templates', os.path.basename(path))])
                     if self.SPLIT_STATIC_APP_DIR:  # include static/appname
-                        for app_path in self._get_paths_of_apps_with_locale():
-                            command.extend(['--source-dir',
-                                            os.path.join(settings.BASE_DIR, 'static', os.path.basename(app_path))])
+                        command.extend(['--source-dir',
+                                        os.path.join(settings.BASE_DIR, 'static', os.path.basename(path))])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
                 subprocess.call(command)
