@@ -114,6 +114,8 @@ class Command(BaseCommand):
                     if self.SPLIT_STATIC_APP_DIR:  # include static/appname
                         command.extend(['--source-dir',
                                         os.path.join(settings.BASE_DIR, 'static', os.path.basename(path))])
+                    if self.SPLIT_STATIC_APP_DIR or self.SPLIT_TEMPLATE_APP_DIR:
+                        command.extend(['--source-dir', path])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
                 subprocess.call(command)
