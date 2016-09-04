@@ -95,17 +95,18 @@ class Command(BaseCommand):
                 if extensions:
                     command.extend(['-e', ','.join(extensions)])
                 if path == settings.BASE_DIR:
+                    rel_path = lambda p: os.path.relpath(p, path)
                     for app_path in self._get_paths_of_apps_with_locale():
-                        command.extend(['-i', '{}/*'.format(app_path)])
+                        command.extend(['-i', '{}/*'.format(rel_path(app_path))])
                     if self.SPLIT_TEMPLATE_APP_DIR:  # exclude templates/appname
                         for app_path in self._get_paths_of_apps_with_locale():
                             command.extend(['-i', '{}/*'.format(
-                                os.path.join(settings.BASE_DIR, 'templates', os.path.basename(app_path))
+                                rel_path(os.path.join(settings.BASE_DIR, 'templates', os.path.basename(app_path)))
                             )])
                     if self.SPLIT_STATIC_APP_DIR:  # exclude static/appname
                         for app_path in self._get_paths_of_apps_with_locale():
                             command.extend(['-i', '{}/*'.format(
-                                os.path.join(settings.BASE_DIR, 'static', os.path.basename(app_path))
+                                rel_path(os.path.join(settings.BASE_DIR, 'static', os.path.basename(app_path)))
                             )])
                 else:
                     locale_dir = os.path.join(path, 'locale')
@@ -120,8 +121,6 @@ class Command(BaseCommand):
                             '--add-source-dir',
                             os.path.join(settings.BASE_DIR, 'static', os.path.basename(path)) + locale_dir_suffix,
                         ])
-                    # if self.SPLIT_STATIC_APP_DIR or self.SPLIT_TEMPLATE_APP_DIR:
-                    #     command.extend(['--source-dir', path])
                 self.stdout.write('[%s] %s' % (path, ' '.join(command)))
                 self._make_locale_dirs(path)
                 subprocess.call(command)
