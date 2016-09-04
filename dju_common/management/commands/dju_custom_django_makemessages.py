@@ -5,7 +5,8 @@ class Command(makemessages.Command):
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
         parser.add_argument('--add-source-dir', action='append', dest='additional_source_dirs',
-                            default=[], metavar='DIR', help='Additional source directory.')
+                            default=[], metavar='DIR',
+                            help='Additional source directory. For example: "/path/to/src:/path/to/locale"')
 
     def handle(self, *args, **options):
         self.additional_source_dirs = options['additional_source_dirs']
@@ -15,6 +16,14 @@ class Command(makemessages.Command):
         files = super(Command, self).find_files(root)
         print 'FILES 1', files
         for d in self.additional_source_dirs:
-            files.extend(super(Command, self).find_files(d))
+            if ':' in d:
+                src_dir, locale_dir = d.split(':', 1)
+            else:
+                src_dir, locale_dir = d, None
+            add_files = super(Command, self).find_files(src_dir)
+            if locale_dir:
+                for add_file in add_files:
+                    add_file.locale_dir = locale_dir
+            files.extend(add_files)
         print 'FILES 2', files
         return sorted(files)
