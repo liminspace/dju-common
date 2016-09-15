@@ -26,6 +26,8 @@ class Command(BaseCommand):
         parser.add_argument('--extension', '-e', action='append', dest='extensions', default=None,
                             help='The file extension(s) to examine (default: "html,txt,rml", or "js" if the domain is '
                                  '"djangojs"). Separate multiple extensions with commas, or use -e multiple times.')
+        parser.add_argument('--omit-header', action='store_true', dest='omit_header', default=False,
+                            help="Don't write header with 'msgid \"\"' entry.")
 
     def _get_paths_of_apps(self, apps):
         result = []
@@ -79,6 +81,8 @@ class Command(BaseCommand):
                 command_base.extend(['-l', lang])
         else:
             command_base.append('-a')
+        if options['omit_header']:
+            command_base.append('--omit-header')
         if not options['domain']:
             options['domain'] = ['django', 'djangojs']
         for path in paths:

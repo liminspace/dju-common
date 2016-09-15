@@ -9,9 +9,13 @@ class Command(makemessages.Command):
         parser.add_argument('--add-source-dir', action='append', dest='additional_source_dirs',
                             default=[], metavar='DIR',
                             help='Additional source directory. For example: "/path/to/src:/path/to/locale"')
+        parser.add_argument('--omit-header', action='store_true', dest='omit_header', default=False,
+                            help="Don't write header with 'msgid \"\"' entry.")
 
     def handle(self, *args, **options):
         self.additional_source_dirs = options['additional_source_dirs']
+        if options['omit_header']:
+            self.xgettext_options = makemessages.Command.xgettext_options[:] + ['--omit-header']
         super(Command, self).handle(*args, **options)
 
     def find_files(self, root):
