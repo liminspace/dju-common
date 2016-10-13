@@ -368,9 +368,10 @@ def url_getvars_without(context, token):
     return mark_for_escaping(_url_getvars(context, token, 'without'))
 
 
-@register.simple_tag
-def full_url_prefix(secure=None):
-    return full_url(secure=secure)
+@register.simple_tag(takes_context=True)
+def full_url_prefix(context, secure=None):
+    request = context.get('request', None)
+    return full_url(secure=secure, request=request)
 
 
 @register.filter

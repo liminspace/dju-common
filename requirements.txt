@@ -1,6 +1,9 @@
-django<1.10
+pip
+setuptools
+wheel
+
+django<1.11
 simplejson==3.8.2
-django-redis==4.4.4
-pytz==2016.6.1
+django-redis==4.5.0
+pytz==2016.7
 coverage==4.2
-wheel==0.29.0

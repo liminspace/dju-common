@@ -100,8 +100,8 @@ def add_response_headers(h):
     return headers_wrapper
 
 
-def full_url(path=None, secure=None):
+def full_url(path=None, secure=None, request=None):
     if secure is None:
         secure = dju_settings.USE_HTTPS
-    site = Site.objects.get_current()
+    site = Site.objects.get_current(request)
     return '{}://{}{}'.format((secure and 'https' or 'http'), site.domain, path or '')
