@@ -27,4 +27,4 @@ class TestTemplatetagsCommon(TestCase):
 
     def test_gravatar_profile_url(self):
         t = self.get_tpl_f('{{ var|gravatar_profile_url }}', {'var': 'liminspace@gmail.com'})
-        self.assertEqual(t(), 'http://ru.gravatar.com/903e415f53009aef5c2c3c1330ec74da')
+        self.assertEqual(t(), 'http://gravatar.com/903e415f53009aef5c2c3c1330ec74da')

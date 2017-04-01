@@ -18,7 +18,7 @@ def get_ava_url(email, size=None):
 
 
 def get_profile_url(email):
-    return '{}://ru.gravatar.com/{}'.format(
+    return '{}://gravatar.com/{}'.format(
         (dju_settings.DJU_GRAVATAR_SECURE and 'https' or 'http'),
         hashlib.md5(email.lower()).hexdigest()
     )
