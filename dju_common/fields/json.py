@@ -36,6 +36,8 @@ class JSONFormField(CharField):
         kwargs['sort_keys'] = True
         if isinstance(self.widget, Textarea):
             kwargs['indent'] = 4
+            kwargs['separators'] = (',', ': ')
+            kwargs['ensure_ascii'] = False
         return simplejson.dumps(value, **kwargs)
 
 
