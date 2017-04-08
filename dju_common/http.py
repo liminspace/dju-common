@@ -10,13 +10,21 @@ from django.shortcuts import resolve_url
 from . import settings as dju_settings
 
 
+def encode_url_query_params(params):
+    assert isinstance(params, dict)
+    result = {}
+    for k, v in params.iteritems():
+        result[k] = unicode(v).encode('utf-8')
+    return result
+
+
 def resolve_url_ext(to, params_=None, anchor_=None, *args, **kwargs):
     """
     Advanced resolve_url which can includes GET-parameters and anchor.
     """
     url = resolve_url(to, *args, **kwargs)
     if params_:
-        url += '?' + urllib.urlencode(params_)
+        url += '?' + urllib.urlencode(encode_url_query_params(params_))
     if anchor_:
         url += '#' + anchor_
     return url
@@ -78,7 +86,7 @@ def change_url_query_params(url, params):
     url_parts = list(urlparse.urlparse(url))
     query = dict(urlparse.parse_qsl(url_parts[4]))
     query.update(params)
-    url_parts[4] = urllib.urlencode(query)
+    url_parts[4] = urllib.urlencode(encode_url_query_params(query))
     return urlparse.urlunparse(url_parts)
 
 
