@@ -17,7 +17,7 @@ class DebuggingServer(SMTPServer):
         SMTPServer.__init__(self, *args, **kwargs)
         sys.stdout = codecs.getwriter('utf8')(sys.stdout)
         sys.stderr = codecs.getwriter('utf8')(sys.stderr)
-        print 'Debug email server is running. Now you can send emails to SMTP localhost:10250.'
+        print('Debug email server is running. Now you can send emails to SMTP localhost:10250.')
 
     @staticmethod
     def _get_subject(data):
@@ -66,16 +66,16 @@ class DebuggingServer(SMTPServer):
                     if DJU_EMAIL_DEBUG_IN_FILES:
                         f.write(u'X-Peer: {}\n'.format(force_unicode(peer[0])))
                     if DJU_EMAIL_DEBUG_IN_CONSOLE:
-                        print u'X-Peer: {}'.format(force_unicode(peer[0]))
+                        print(u'X-Peer: {}'.format(force_unicode(peer[0])))
                     inheaders = 0
                 line = force_unicode(line)
                 if DJU_EMAIL_DEBUG_IN_FILES:
                     f.write(u'{}\n'.format(line))
                 if DJU_EMAIL_DEBUG_IN_CONSOLE:
-                    print line
+                    print(line)
         except Exception, e:
             traceback.print_exc()
-            print 'DebuggingServer error: {}'.format(force_unicode(e))
+            print('DebuggingServer error: {}'.format(force_unicode(e)))
 
 
 class Command(BaseCommand):

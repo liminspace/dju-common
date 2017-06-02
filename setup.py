@@ -10,14 +10,14 @@ setup(
     description='Django Utils: Common Library',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     license='MIT',
-    author='Igor Melnyk',
+    author='Igor Melnyk @liminspace',
     author_email='liminspace@gmail.com',
     url='https://github.com/liminspace/dju-common',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,  # because include static
     install_requires=[
-        'django>=1.9,<1.11',
+        'django>=1.8,<1.12',
         'simplejson',
     ],
 )

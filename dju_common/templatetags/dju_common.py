@@ -56,7 +56,7 @@ class CaptureasNode(template.Node):
     def render(self, context):
         output = self.nodelist.render(context)
         context[self.varname] = output
-        return output if self.assign_and_print else ''
+        return(output if self.assign_and_print else '')
 
 
 @register.tag
@@ -266,17 +266,17 @@ def paginator(context, page, leading=8, out=3, adjacent=3, sep='...'):
     is_paginated = num_pages > 1
     if is_paginated:
         if num_pages < leading:
-            leading_pages = [x for x in xrange(1, leading) if x <= num_pages]
+            leading_pages = [x for x in range(1, leading) if x <= num_pages]
         elif page.number <= leading - 1:
-            leading_pages = [x for x in xrange(1, leading + 1)]
-            out_right_pages = [x + num_pages for x in xrange(-out + 1, 1) if x + num_pages > leading]
+            leading_pages = [x for x in range(1, leading + 1)]
+            out_right_pages = [x + num_pages for x in range(-out + 1, 1) if x + num_pages > leading]
         elif page.number > num_pages - leading + 1:
-            leading_pages = [x for x in xrange(num_pages - leading + 1, num_pages + 1) if x <= num_pages]
-            out_left_pages = [x for x in xrange(1, out + 1) if num_pages - x >= leading]
+            leading_pages = [x for x in range(num_pages - leading + 1, num_pages + 1) if x <= num_pages]
+            out_left_pages = [x for x in range(1, out + 1) if num_pages - x >= leading]
         else:
-            leading_pages = [x for x in xrange(page.number - adjacent, page.number + adjacent + 1)]
-            out_right_pages = [x + num_pages for x in xrange(-out + 1, 1)]
-            out_left_pages = [x for x in xrange(1, out + 1)]
+            leading_pages = [x for x in range(page.number - adjacent, page.number + adjacent + 1)]
+            out_right_pages = [x + num_pages for x in range(-out + 1, 1)]
+            out_left_pages = [x for x in range(1, out + 1)]
     if out_left_pages:
         pages.extend(out_left_pages)
         pages.append(sep)

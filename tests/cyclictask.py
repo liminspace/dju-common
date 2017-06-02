@@ -5,7 +5,7 @@ class RunHandlerSiteTasks(CyclicTaskBase):
     run_interval = 1000
 
     def task(self):
-        print 'Hello world'
+        print('Hello world')
 
 
 RunHandlerSiteTasks.register()

@@ -100,7 +100,7 @@ class TestRenderMailSender(TestCase):
         self.assertTrue(u'Номер телефону' in mail.outbox[0].body)
 
     def test_render_mail_render_error(self):
-        for i in xrange(1, 4):
+        for i in range(1, 4):
             t = RenderMailSender('mail/test_invalid_{}.html'.format(i))
             with self.assertRaises(t.TemplateEmailTagNotFound):
                 t.send('testerror{}@mail.com'.format(i))

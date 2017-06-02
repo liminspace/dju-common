@@ -7,7 +7,7 @@ def mt_fields(fields, nomaster=False, onlydefaultlang=False):
     """
     Returns list of fields for multilanguage fields of model.
     Examples:
-        print mt_fields('name', 'desc')
+        print(mt_fields('name', 'desc'))
         ['name', 'name_en', 'name_uk', 'desc', 'desc_en', 'desc_uk']
 
         MyModel.objects.only(*mt_fields('name', 'desc', 'content'))

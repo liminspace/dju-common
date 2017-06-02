@@ -245,7 +245,7 @@ class TestTemplatetagsCommon(TestCase):
         self.assertEqual(t(), escape('[{"a": 1}, {"b": [2, 3]}]'))
 
     def test_paginator(self):
-        paginator = Paginator(tuple(xrange(50)), 10)
+        paginator = Paginator(tuple(range(50)), 10)
 
         t = self.get_tpl_f('{% paginator var %}', {'var': paginator.page(1)})
         self.assertEqual(t(), (
@@ -280,7 +280,7 @@ class TestTemplatetagsCommon(TestCase):
             '<li class="disabled">next</li>'
         ))
 
-        paginator = Paginator(tuple(xrange(500)), 10)
+        paginator = Paginator(tuple(range(500)), 10)
 
         t = self.get_tpl_f('{% paginator var %}', {'var': paginator.page(1)})
         self.assertEqual(t(), (
