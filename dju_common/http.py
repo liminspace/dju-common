@@ -18,11 +18,11 @@ def encode_url_query_params(params):
     return result
 
 
-def resolve_url_ext(to, params_=None, anchor_=None, *args, **kwargs):
+def resolve_url_ext(to, params_=None, anchor_=None, args=None, kwargs=None):
     """
     Advanced resolve_url which can includes GET-parameters and anchor.
     """
-    url = resolve_url(to, *args, **kwargs)
+    url = resolve_url(to, *(args or ()), **(kwargs or {}))
     if params_:
         url += '?' + urllib.urlencode(encode_url_query_params(params_))
     if anchor_:
@@ -66,7 +66,7 @@ def send_jsonp(data, f='jsonpCallback', status=200, json_dumps_kwargs=None):
     )
 
 
-def redirect_ext(to, params_=None, anchor_=None, permanent_=False, *args, **kwargs):
+def redirect_ext(to, params_=None, anchor_=None, permanent_=False, args=None, kwargs=None):
     """
     Advanced redirect which can includes GET-parameters and anchor.
     """
@@ -74,7 +74,7 @@ def redirect_ext(to, params_=None, anchor_=None, permanent_=False, *args, **kwar
         redirect_class = HttpResponsePermanentRedirect
     else:
         redirect_class = HttpResponseRedirect
-    return redirect_class(resolve_url_ext(to, params_, anchor_, *args, **kwargs))
+    return redirect_class(resolve_url_ext(to, params_, anchor_, args, kwargs))
 
 
 def change_url_query_params(url, params):
